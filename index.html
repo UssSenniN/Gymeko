@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plano de Treino + Calculadora Nutricional</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 20px;
+      color: #333;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .dia, .extra, .calculadora {
+      background-color: #ffffff;
+      border-left: 5px solid #3498db;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    ul {
+      margin-top: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      padding: 5px;
+      width: 100%;
+      max-width: 300px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .resultado {
+      margin-top: 15px;
+      background-color: #eaf2f8;
+      padding: 10px;
+      border-left: 5px solid #27ae60;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🏋 Plano Semanal de Treino + Calculadora Nutricional</h1>
+  <p><strong>Objetivo:</strong> Hipertrofia, força e resistência muscular<br>
+     <strong>Atleta:</strong> Andreilson</p>
+
+  <!-- Treino semanal -->
+  <div class="dia">
+    <h2>🔥 Segunda – Peito e Ombro + Antebraço</h2>
+    <ul>
+      <li>Supino reto com barra – 4x8</li>
+      <li>Supino inclinado com halteres – 3x10</li>
+      <li>Crucifixo reto – 3x12</li>
+      <li>Desenvolvimento militar – 4x8</li>
+      <li>Elevação lateral – 3x12</li>
+      <li>Rosca inversa – 3x15</li>
+      <li>Prancha – 3x30 segundos</li>
+    </ul>
+  </div>
+
+  <!-- Repetir os blocos de treino para os outros dias como antes... -->
+
+  <!-- Calculadora nutricional -->
+  <div class="calculadora">
+    <h2>🍽 Calculadora de Proteínas e Carboidratos</h2>
+    <label for="peso">Seu peso (kg):</label>
+    <input type="number" id="peso" placeholder="Ex: 70">
+
+    <label for="objetivo">Objetivo:</label>
+    <select id="objetivo">
+      <option value="manter">Manter peso</option>
+      <option value="ganhar">Ganhar massa muscular</option>
+      <option value="perder">Perder gordura</option>
+    </select>
+
+    <label for="atividade">Nível de atividade:</label>
+    <select id="atividade">
+      <option value="leve">Leve (1–2x por semana)</option>
+      <option value="moderada">Moderada (3–4x por semana)</option>
+      <option value="intensa">Intensa (5–6x por semana)</option>
+    </select>
+
+    <button onclick="calcularMacros()">Calcular</button>
+
+    <div class="resultado" id="resultado"></div>
+  </div>
+
+  <script>
+    function calcularMacros() {
+      const peso = parseFloat(document.getElementById('peso').value);
+      const objetivo = document.getElementById('objetivo').value;
+      const atividade = document.getElementById('atividade').value;
+      const resultado = document.getElementById('resultado');
+
+      if (isNaN(peso) || peso <= 0) {
+        resultado.innerHTML = "Por favor, insira um peso válido.";
+        return;
+      }
+
+      let proteinaPorKg = 1.6;
+      let carboPorKg = 4;
+
+      if (objetivo === "ganhar") {
+        proteinaPorKg = 2.0;
+        carboPorKg = 5;
+      } else if (objetivo === "perder") {
+        proteinaPorKg = 2.2;
+        carboPorKg = 3;
+      }
+
+      if (atividade === "moderada") {
+        carboPorKg += 0.5;
+      } else if (atividade === "intensa") {
+        carboPorKg += 1;
+      }
+
+      const proteinaTotal = (peso * proteinaPorKg).toFixed(1);
+      const carboTotal = (peso * carboPorKg).toFixed(1);
+
+      resultado.innerHTML = `
+        <strong>Resultado diário estimado:</strong><br>
+        Proteínas: <strong>${proteinaTotal}g</strong><br>
+        Carboidratos: <strong>${carboTotal}g</strong><br>
+        <em>Esses valores são estimativas e podem ser ajustados com acompanhamento profissional.</em>
+      `;
+    }
+  </script>
+
+</body>
+</html>
