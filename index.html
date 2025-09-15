@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora Nutricional Academia</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
     .container { max-width: 480px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); padding: 24px; }
@@ -55,60 +56,168 @@
         <option value="avancado">Avançado</option>
       </select>
       <div id="treinoExemplo" class="treino" style="display:none;"></div>
-      <button type="submit">Calcular e Salvar</button>
+      <button type="submit">Calcular e Salvar PDF</button>
     </form>
     <div class="resultado" id="resultado"></div>
-    <a id="downloadLink" style="display:none"></a>
   </div>
   <script>
+    // Grupos musculares organizados por dia para cada nível
     const treinos = {
       iniciante: {
         titulo: "Treino Iniciante (3x/semana)",
         dias: [
-          "Segunda: Peito, Tríceps, Abdômen",
-          "Quarta: Costas, Bíceps",
-          "Sexta: Pernas, Ombro"
-        ],
-        detalhes: [
-          "Supino reto 3x12, Tríceps pulley 3x12, Abdominal 3x15",
-          "Puxada frente 3x12, Rosca direta 3x12",
-          "Agachamento 3x12, Elevação lateral 3x12"
+          {
+            dia: "Segunda-feira",
+            grupos: "Peito e Tríceps",
+            detalhes: [
+              "Supino reto 3x12",
+              "Crucifixo 3x12",
+              "Tríceps pulley 3x12",
+              "Mergulho banco 3x10"
+            ]
+          },
+          {
+            dia: "Quarta-feira",
+            grupos: "Costas e Bíceps",
+            detalhes: [
+              "Puxada frente 3x12",
+              "Remada baixa 3x12",
+              "Rosca direta 3x12",
+              "Rosca alternada 3x10"
+            ]
+          },
+          {
+            dia: "Sexta-feira",
+            grupos: "Pernas (Quadríceps, Posterior) e Abdômen",
+            detalhes: [
+              "Agachamento 3x12",
+              "Cadeira extensora 3x12",
+              "Mesa flexora 3x12",
+              "Abdominal supra 3x15"
+            ]
+          }
         ]
       },
       intermediario: {
         titulo: "Treino Intermediário (5x/semana)",
         dias: [
-          "Segunda: Peito, Abdômen",
-          "Terça: Costas, Trapézio",
-          "Quarta: Pernas",
-          "Quinta: Ombro, Abdômen",
-          "Sexta: Bíceps, Tríceps"
-        ],
-        detalhes: [
-          "Supino reto 4x10, Crucifixo 3x12, Abdominal 4x15",
-          "Remada curvada 4x10, Encolhimento 3x12",
-          "Agachamento 4x10, Leg press 3x12",
-          "Desenvolvimento 4x10, Elevação lateral 3x12, Abdominal 4x15",
-          "Rosca direta 4x10, Tríceps francês 4x10"
+          {
+            dia: "Segunda-feira",
+            grupos: "Peito e Tríceps",
+            detalhes: [
+              "Supino reto 4x10",
+              "Supino inclinado 3x10",
+              "Tríceps francês 3x12",
+              "Tríceps corda 3x12"
+            ]
+          },
+          {
+            dia: "Terça-feira",
+            grupos: "Costas e Bíceps",
+            detalhes: [
+              "Puxada alta 4x10",
+              "Remada curvada 3x10",
+              "Rosca direta 4x10",
+              "Rosca martelo 3x12"
+            ]
+          },
+          {
+            dia: "Quarta-feira",
+            grupos: "Pernas (Quadríceps, Posterior) e Glúteos",
+            detalhes: [
+              "Agachamento livre 4x10",
+              "Leg press 3x12",
+              "Mesa flexora 3x12",
+              "Glúteo máquina 3x15"
+            ]
+          },
+          {
+            dia: "Quinta-feira",
+            grupos: "Ombro e Abdômen",
+            detalhes: [
+              "Desenvolvimento 4x10",
+              "Elevação lateral 3x12",
+              "Abdominal infra 4x15",
+              "Prancha 3x30s"
+            ]
+          },
+          {
+            dia: "Sexta-feira",
+            grupos: "Posterior Completo e Panturrilha",
+            detalhes: [
+              "Stiff 4x10",
+              "Mesa flexora 4x10",
+              "Panturrilha em pé 4x15",
+              "Abdominal oblíquo 3x15"
+            ]
+          }
         ]
       },
       avancado: {
         titulo: "Treino Avançado (6x/semana)",
         dias: [
-          "Segunda: Peito, Tríceps",
-          "Terça: Costas, Bíceps",
-          "Quarta: Pernas",
-          "Quinta: Ombro, Abdômen",
-          "Sexta: Pernas, Abdômen",
-          "Sábado: Full body"
-        ],
-        detalhes: [
-          "Supino inclinado 4x8, Tríceps testa 4x10",
-          "Puxada alta 4x8, Rosca alternada 4x10",
-          "Agachamento livre 5x8, Stiff 4x10",
-          "Desenvolvimento Arnold 4x8, Abdominal infra 4x15",
-          "Cadeira extensora 4x10, Flexora 4x10, Abdominal oblíquo 4x15",
-          "Circuito: Supino, Remada, Agachamento, Abdômen 3x15 cada"
+          {
+            dia: "Segunda-feira",
+            grupos: "Upper (Peito, Costas, Ombro, Bíceps, Tríceps)",
+            detalhes: [
+              "Supino reto 4x8",
+              "Remada curvada 4x8",
+              "Desenvolvimento Arnold 4x10",
+              "Rosca direta 3x10",
+              "Tríceps testa 3x10"
+            ]
+          },
+          {
+            dia: "Terça-feira",
+            grupos: "Lower (Quadríceps, Posterior, Glúteos, Panturrilha)",
+            detalhes: [
+              "Agachamento livre 5x8",
+              "Leg press 4x10",
+              "Mesa flexora 4x10",
+              "Glúteo máquina 3x12",
+              "Panturrilha sentada 4x15"
+            ]
+          },
+          {
+            dia: "Quarta-feira",
+            grupos: "Peito e Tríceps",
+            detalhes: [
+              "Supino inclinado 4x8",
+              "Crucifixo inclinado 3x10",
+              "Tríceps corda 4x10",
+              "Mergulho banco 3x12"
+            ]
+          },
+          {
+            dia: "Quinta-feira",
+            grupos: "Costas e Bíceps",
+            detalhes: [
+              "Puxada frente 4x8",
+              "Remada unilateral 4x10",
+              "Rosca alternada 4x10",
+              "Rosca martelo 3x12"
+            ]
+          },
+          {
+            dia: "Sexta-feira",
+            grupos: "Ombro e Abdômen",
+            detalhes: [
+              "Desenvolvimento militar 4x8",
+              "Elevação lateral 4x10",
+              "Abdominal infra 4x15",
+              "Prancha 3x40s"
+            ]
+          },
+          {
+            dia: "Sábado",
+            grupos: "Posterior Completo e Abdômen",
+            detalhes: [
+              "Stiff 4x10",
+              "Mesa flexora 4x10",
+              "Panturrilha em pé 4x15",
+              "Abdominal oblíquo 4x15"
+            ]
+          }
         ]
       }
     };
@@ -119,8 +228,8 @@
       if (treinos[nivel]) {
         treinoDiv.style.display = 'block';
         let html = `<strong>${treinos[nivel].titulo}</strong><ul>`;
-        treinos[nivel].dias.forEach((dia, i) => {
-          html += `<li>${dia}<br><small>${treinos[nivel].detalhes[i]}</small></li>`;
+        treinos[nivel].dias.forEach((diaObj) => {
+          html += `<li><strong>${diaObj.dia}:</strong> ${diaObj.grupos}<br><small>${diaObj.detalhes.join(', ')}</small></li>`;
         });
         html += '</ul>';
         treinoDiv.innerHTML = html;
@@ -165,8 +274,8 @@
       let treinoHtml = '';
       if (treinos[nivel]) {
         treinoHtml = `<strong>${treinos[nivel].titulo}</strong><ul>`;
-        treinos[nivel].dias.forEach((dia, i) => {
-          treinoHtml += `<li>${dia}<br><small>${treinos[nivel].detalhes[i]}</small></li>`;
+        treinos[nivel].dias.forEach((diaObj) => {
+          treinoHtml += `<li><strong>${diaObj.dia}:</strong> ${diaObj.grupos}<br><small>${diaObj.detalhes.join(', ')}</small></li>`;
         });
         treinoHtml += '</ul>';
       }
@@ -189,43 +298,57 @@
         <hr>
         <strong>Treino semanal sugerido:</strong><br>
         ${treinoHtml}
-        <button id="btnSalvar" style="margin-top:16px;">Salvar informações</button>
+        <button id="btnSalvarPDF" style="margin-top:16px;">Salvar informações em PDF</button>
       `;
 
-      // Salvar arquivo ao clicar no botão
       setTimeout(() => {
-        const btnSalvar = document.getElementById('btnSalvar');
+        const btnSalvar = document.getElementById('btnSalvarPDF');
         if(btnSalvar) {
           btnSalvar.onclick = function() {
-            const dados = 
-`Nome: ${nome}
-Peso: ${peso} kg
-Altura: ${altura} cm
-Idade: ${idade} anos
-Sexo: ${sexo}
-Dias de treino/semana: ${treinosSemana}
-Objetivo: ${objetivo}
-Nível: ${nivel}
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-Proteína: ${proteina.toFixed(0)}g/dia
-Carboidrato: ${carboidrato.toFixed(0)}g/dia
-Água: ${agua.toFixed(2)} litros/dia
-Calorias estimadas: ${calorias.toFixed(0)} kcal/dia
+            let y = 15;
+            doc.setFontSize(14);
+            doc.text(`Plano Nutricional e Treino - ${nome}`, 10, y);
+            y += 10;
+            doc.setFontSize(11);
+            doc.text(`Peso: ${peso} kg`, 10, y); y += 7;
+            doc.text(`Altura: ${altura} cm`, 10, y); y += 7;
+            doc.text(`Idade: ${idade} anos`, 10, y); y += 7;
+            doc.text(`Sexo: ${sexo}`, 10, y); y += 7;
+            doc.text(`Dias de treino/semana: ${treinosSemana}`, 10, y); y += 7;
+            doc.text(`Objetivo: ${objetivo}`, 10, y); y += 7;
+            doc.text(`Nível: ${nivel}`, 10, y); y += 10;
 
-Treino semanal sugerido:
-${treinos[nivel] ? treinos[nivel].dias.map((dia, i) => `${dia} - ${treinos[nivel].detalhes[i]}`).join('\n') : ''}
-`;
-            const blob = new Blob([dados], {type: "text/plain"});
-            const a = document.getElementById("downloadLink");
-            a.href = URL.createObjectURL(blob);
-            a.download = `${nome.replace(/\s+/g,'_').toLowerCase()}_plano.txt`;
-            a.style.display = "block";
-            a.click();
-            a.style.display = "none";
+            doc.setFontSize(12);
+            doc.text("Recomendações diárias:", 10, y); y += 7;
+            doc.setFontSize(11);
+            doc.text(`Proteína: ${proteina.toFixed(0)}g/dia`, 10, y); y += 6;
+            doc.text(`Carboidrato: ${carboidrato.toFixed(0)}g/dia`, 10, y); y += 6;
+            doc.text(`Água: ${agua.toFixed(2)} litros/dia`, 10, y); y += 6;
+            doc.text(`Calorias estimadas: ${calorias.toFixed(0)} kcal/dia`, 10, y); y += 10;
+
+            if (treinos[nivel]) {
+              doc.setFontSize(12);
+              doc.text("Treino semanal sugerido:", 10, y); y += 7;
+              doc.setFontSize(11);
+              treinos[nivel].dias.forEach((diaObj) => {
+                doc.text(`${diaObj.dia}: ${diaObj.grupos}`, 10, y); y += 6;
+                diaObj.detalhes.forEach(exercicio => {
+                  doc.text(`- ${exercicio}`, 14, y); y += 5;
+                  if (y > 270) { doc.addPage(); y = 15; }
+                });
+                y += 2;
+                if (y > 270) { doc.addPage(); y = 15; }
+              });
+            }
+
+            doc.save(`${nome.replace(/\s+/g,'_').toLowerCase()}_plano.pdf`);
           }
         }
       }, 100);
-    });
+          });
   </script>
 </body>
 </html>
