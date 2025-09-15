@@ -1,142 +1,224 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Plano de Treino + Calculadora Nutricional</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora Nutricional Academia</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 20px;
-      color: #333;
-    }
-    h1, h2 {
-      color: #2c3e50;
-    }
-    .dia, .extra, .calculadora {
-      background-color: #ffffff;
-      border-left: 5px solid #3498db;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    ul {
-      margin-top: 10px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select {
-      padding: 5px;
-      width: 100%;
-      max-width: 300px;
-      margin-top: 5px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .resultado {
-      margin-top: 15px;
-      background-color: #eaf2f8;
-      padding: 10px;
-      border-left: 5px solid #27ae60;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); padding: 24px; }
+    h2 { text-align: center; color: #0078D7; }
+    label { display: block; margin-top: 12px; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; }
+    button { width: 100%; margin-top: 18px; padding: 12px; background: #0078D7; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+    .resultado { margin-top: 24px; background: #eef3fb; padding: 16px; border-radius: 8px; font-size: 18px; line-height: 1.6; }
+    .treino { margin-top: 16px; background: #e9f7ef; padding: 12px; border-radius: 8px; }
   </style>
 </head>
 <body>
-
-  <h1>🏋 Plano Semanal de Treino + Calculadora Nutricional</h1>
-  <p><strong>Objetivo:</strong> Hipertrofia, força e resistência muscular<br>
-     <strong>Atleta:</strong> Andreilson</p>
-
-  <!-- Treino semanal -->
-  <div class="dia">
-    <h2>🔥 Segunda – Peito e Ombro + Antebraço</h2>
-    <ul>
-      <li>Supino reto com barra – 4x8</li>
-      <li>Supino inclinado com halteres – 3x10</li>
-      <li>Crucifixo reto – 3x12</li>
-      <li>Desenvolvimento militar – 4x8</li>
-      <li>Elevação lateral – 3x12</li>
-      <li>Rosca inversa – 3x15</li>
-      <li>Prancha – 3x30 segundos</li>
-    </ul>
-  </div>
-
-  <!-- Repetir os blocos de treino para os outros dias como antes... -->
-
-  <!-- Calculadora nutricional -->
-  <div class="calculadora">
-    <h2>🍽 Calculadora de Proteínas e Carboidratos</h2>
-    <label for="peso">Seu peso (kg):</label>
-    <input type="number" id="peso" placeholder="Ex: 70">
-
-    <label for="objetivo">Objetivo:</label>
-    <select id="objetivo">
-      <option value="manter">Manter peso</option>
-      <option value="ganhar">Ganhar massa muscular</option>
-      <option value="perder">Perder gordura</option>
-    </select>
-
-    <label for="atividade">Nível de atividade:</label>
-    <select id="atividade">
-      <option value="leve">Leve (1–2x por semana)</option>
-      <option value="moderada">Moderada (3–4x por semana)</option>
-      <option value="intensa">Intensa (5–6x por semana)</option>
-    </select>
-
-    <button onclick="calcularMacros()">Calcular</button>
-
+  <div class="container">
+    <h2>Recomendações Nutricionais e Treino</h2>
+    <form id="formNutri">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" required>
+      <label for="peso">Peso (kg):</label>
+      <input type="number" id="peso" required min="30" max="300" step="0.1">
+      <label for="altura">Altura (cm):</label>
+      <input type="number" id="altura" required min="120" max="250">
+      <label for="idade">Idade:</label>
+      <input type="number" id="idade" required min="10" max="100">
+      <label for="sexo">Sexo:</label>
+      <select id="sexo" required>
+        <option value="">Selecione</option>
+        <option value="masculino">Masculino</option>
+        <option value="feminino">Feminino</option>
+      </select>
+      <label for="treinos">Dias de treino por semana:</label>
+      <select id="treinos" required>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+      </select>
+      <label for="objetivo">Objetivo:</label>
+      <select id="objetivo" required>
+        <option value="manter">Manter peso</option>
+        <option value="ganhar">Ganhar massa</option>
+        <option value="perder">Perder gordura</option>
+      </select>
+      <label for="nivel">Nível de treino:</label>
+      <select id="nivel" required onchange="mostrarTreino()">
+        <option value="">Selecione</option>
+        <option value="iniciante">Iniciante</option>
+        <option value="intermediario">Intermediário</option>
+        <option value="avancado">Avançado</option>
+      </select>
+      <div id="treinoExemplo" class="treino" style="display:none;"></div>
+      <button type="submit">Calcular e Salvar</button>
+    </form>
     <div class="resultado" id="resultado"></div>
   </div>
-
   <script>
-    function calcularMacros() {
-      const peso = parseFloat(document.getElementById('peso').value);
-      const objetivo = document.getElementById('objetivo').value;
-      const atividade = document.getElementById('atividade').value;
-      const resultado = document.getElementById('resultado');
-
-      if (isNaN(peso) || peso <= 0) {
-        resultado.innerHTML = "Por favor, insira um peso válido.";
-        return;
+    const treinos = {
+      iniciante: {
+        titulo: "Treino Iniciante (3x/semana)",
+        dias: [
+          "Segunda: Peito, Tríceps, Abdômen",
+          "Quarta: Costas, Bíceps",
+          "Sexta: Pernas, Ombro"
+        ],
+        detalhes: [
+          "Supino reto 3x12, Tríceps pulley 3x12, Abdominal 3x15",
+          "Puxada frente 3x12, Rosca direta 3x12",
+          "Agachamento 3x12, Elevação lateral 3x12"
+        ]
+      },
+      intermediario: {
+        titulo: "Treino Intermediário (5x/semana)",
+        dias: [
+          "Segunda: Peito, Abdômen",
+          "Terça: Costas, Trapézio",
+          "Quarta: Pernas",
+          "Quinta: Ombro, Abdômen",
+          "Sexta: Bíceps, Tríceps"
+        ],
+        detalhes: [
+          "Supino reto 4x10, Crucifixo 3x12, Abdominal 4x15",
+          "Remada curvada 4x10, Encolhimento 3x12",
+          "Agachamento 4x10, Leg press 3x12",
+          "Desenvolvimento 4x10, Elevação lateral 3x12, Abdominal 4x15",
+          "Rosca direta 4x10, Tríceps francês 4x10"
+        ]
+      },
+      avancado: {
+        titulo: "Treino Avançado (6x/semana)",
+        dias: [
+          "Segunda: Peito, Tríceps",
+          "Terça: Costas, Bíceps",
+          "Quarta: Pernas",
+          "Quinta: Ombro, Abdômen",
+          "Sexta: Pernas, Abdômen",
+          "Sábado: Full body"
+        ],
+        detalhes: [
+          "Supino inclinado 4x8, Tríceps testa 4x10",
+          "Puxada alta 4x8, Rosca alternada 4x10",
+          "Agachamento livre 5x8, Stiff 4x10",
+          "Desenvolvimento Arnold 4x8, Abdominal infra 4x15",
+          "Cadeira extensora 4x10, Flexora 4x10, Abdominal oblíquo 4x15",
+          "Circuito: Supino, Remada, Agachamento, Abdômen 3x15 cada"
+        ]
       }
+    };
 
-      let proteinaPorKg = 1.6;
-      let carboPorKg = 4;
-
-      if (objetivo === "ganhar") {
-        proteinaPorKg = 2.0;
-        carboPorKg = 5;
-      } else if (objetivo === "perder") {
-        proteinaPorKg = 2.2;
-        carboPorKg = 3;
+    function mostrarTreino() {
+      const nivel = document.getElementById('nivel').value;
+      const treinoDiv = document.getElementById('treinoExemplo');
+      if (treinos[nivel]) {
+        treinoDiv.style.display = 'block';
+        let html = `<strong>${treinos[nivel].titulo}</strong><ul>`;
+        treinos[nivel].dias.forEach((dia, i) => {
+          html += `<li>${dia}<br><small>${treinos[nivel].detalhes[i]}</small></li>`;
+        });
+        html += '</ul>';
+        treinoDiv.innerHTML = html;
+      } else {
+        treinoDiv.style.display = 'none';
+        treinoDiv.innerHTML = '';
       }
-
-      if (atividade === "moderada") {
-        carboPorKg += 0.5;
-      } else if (atividade === "intensa") {
-        carboPorKg += 1;
-      }
-
-      const proteinaTotal = (peso * proteinaPorKg).toFixed(1);
-      const carboTotal = (peso * carboPorKg).toFixed(1);
-
-      resultado.innerHTML = `
-        <strong>Resultado diário estimado:</strong><br>
-        Proteínas: <strong>${proteinaTotal}g</strong><br>
-        Carboidratos: <strong>${carboTotal}g</strong><br>
-        <em>Esses valores são estimativas e podem ser ajustados com acompanhamento profissional.</em>
-      `;
     }
-  </script>
 
-</body>
-</html>
+    document.getElementById('formNutri').addEventListener('submit', function(e){
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const peso = parseFloat(document.getElementById('peso').value);
+      const altura = parseFloat(document.getElementById('altura').value);
+      const idade = parseInt(document.getElementById('idade').value);
+      const sexo = document.getElementById('sexo').value;
+      const treinosSemana = parseInt(document.getElementById('treinos').value);
+      const objetivo = document.getElementById('objetivo').value;
+      const nivel = document.getElementById('nivel').value;
+
+      // Cálculo de proteína (g/kg): manter=1.5, ganhar=2, perder=2.2
+      let prot = objetivo === 'manter' ? 1.5 : objetivo === 'ganhar' ? 2 : 2.2;
+      let proteina = peso * prot;
+
+      // Carboidrato (g/kg): manter=4, ganhar=5, perder=3
+      let carb = objetivo === 'manter' ? 4 : objetivo === 'ganhar' ? 5 : 3;
+      let carboidrato = peso * carb;
+
+      // Água: 35ml/kg
+      let agua = peso * 0.035;
+
+      // Calorias estimadas (simples): 
+      let tmb = sexo === 'masculino'
+        ? 88.36 + (13.4 * peso) + (4.8 * altura) - (5.7 * idade)
+        : 447.6 + (9.2 * peso) + (3.1 * altura) - (4.3 * idade);
+      let fatorAtiv = 1.2 + (treinosSemana-3)*0.1; // quanto mais treino, maior o fator
+      let calorias = tmb * fatorAtiv;
+      if(objetivo === 'ganhar') calorias += 300;
+      if(objetivo === 'perder') calorias -= 300;
+
+      // Monta treino semanal
+      let treinoHtml = '';
+      if (treinos[nivel]) {
+        treinoHtml = `<strong>${treinos[nivel].titulo}</strong><ul>`;
+        treinos[nivel].dias.forEach((dia, i) => {
+          treinoHtml += `<li>${dia}<br><small>${treinos[nivel].detalhes[i]}</small></li>`;
+        });
+        treinoHtml += '</ul>';
+      }
+
+      // Mostra resultado na tela
+      document.getElementById('resultado').innerHTML = `
+        <strong>Nome:</strong> ${nome}<br>
+        <strong>Peso:</strong> ${peso} kg<br>
+        <strong>Altura:</strong> ${altura} cm<br>
+        <strong>Idade:</strong> ${idade} anos<br>
+        <strong>Sexo:</strong> ${sexo}<br>
+        <strong>Dias de treino/semana:</strong> ${treinosSemana}<br>
+        <strong>Objetivo:</strong> ${objetivo}<br>
+        <strong>Nível:</strong> ${nivel}<br>
+        <hr>
+        <strong>Proteína:</strong> ${proteina.toFixed(0)}g/dia<br>
+        <strong>Carboidrato:</strong> ${carboidrato.toFixed(0)}g/dia<br>
+        <strong>Água:</strong> ${agua.toFixed(2)} litros/dia<br>
+        <strong>Calorias estimadas:</strong> ${calorias.toFixed(0)} kcal/dia
+        <hr>
+        <strong>Treino semanal sugerido:</strong><br>
+        ${treinoHtml}
+        <button id="btnSalvar" style="margin-top:16px;">Salvar informações</button>
+      `;
+
+      // Salvar arquivo ao clicar no botão
+      setTimeout(() => {
+        const btnSalvar = document.getElementById('btnSalvar');
+        if(btnSalvar) {
+          btnSalvar.onclick = function() {
+            const dados = `
+Nome: ${nome}
+Peso: ${peso} kg
+Altura: ${altura} cm
+Idade: ${idade} anos
+Sexo: ${sexo}
+Dias de treino/semana: ${treinosSemana}
+Objetivo: ${objetivo}
+Nível: ${nivel}
+
+Proteína: ${proteina.toFixed(0)}g/dia
+Carboidrato: ${carboidrato.toFixed(0)}g/dia
+Água: ${agua.toFixed(2)} litros/dia
+Calorias estimadas: ${calorias.toFixed(0)} kcal/dia
+
+Treino semanal sugerido:
+${treinos[nivel] ? treinos[nivel].dias.map((dia, i) => `${dia} - ${treinos[nivel].detalhes[i]}`).join('\n') : ''}
+            `;
+            const blob = new Blob([dados], {type: "text/plain"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${nome.replace(/\s+/g,'_').toLowerCase()}_plano.txt`;
+            a.click();
+          }
+        }
+      },
