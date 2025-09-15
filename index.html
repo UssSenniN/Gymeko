@@ -58,6 +58,7 @@
       <button type="submit">Calcular e Salvar</button>
     </form>
     <div class="resultado" id="resultado"></div>
+    <a id="downloadLink" style="display:none"></a>
   </div>
   <script>
     const treinos = {
@@ -196,8 +197,8 @@
         const btnSalvar = document.getElementById('btnSalvar');
         if(btnSalvar) {
           btnSalvar.onclick = function() {
-            const dados = `
-Nome: ${nome}
+            const dados = 
+`Nome: ${nome}
 Peso: ${peso} kg
 Altura: ${altura} cm
 Idade: ${idade} anos
@@ -213,12 +214,18 @@ Calorias estimadas: ${calorias.toFixed(0)} kcal/dia
 
 Treino semanal sugerido:
 ${treinos[nivel] ? treinos[nivel].dias.map((dia, i) => `${dia} - ${treinos[nivel].detalhes[i]}`).join('\n') : ''}
-            `;
+`;
             const blob = new Blob([dados], {type: "text/plain"});
-            const a = document.createElement("a");
+            const a = document.getElementById("downloadLink");
             a.href = URL.createObjectURL(blob);
             a.download = `${nome.replace(/\s+/g,'_').toLowerCase()}_plano.txt`;
+            a.style.display = "block";
             a.click();
+            a.style.display = "none";
           }
         }
-      },
+      }, 100);
+    });
+  </script>
+</body>
+</html>
